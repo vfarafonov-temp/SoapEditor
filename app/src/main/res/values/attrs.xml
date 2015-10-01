@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="ColorPicker">
+		<attr name="picker_radius" format="dimension" />
+		<attr name="line_thickness" format="dimension" />
+		<attr name="circle_stroke_thickness" format="dimension" />
+		<attr name="progress" format="float" />
+	</declare-styleable>
+</resources>
