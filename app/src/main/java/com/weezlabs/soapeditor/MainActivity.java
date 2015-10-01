@@ -1,16 +1,69 @@
 package com.weezlabs.soapeditor;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
+
+	private View.OnClickListener changeTextClickListener_;
+	private RelativeLayout rootView_;
+	private View contentView_;
+	private EditText overlayTextView_;
+	private ColorPicker colorPicker_;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		rootView_ = (RelativeLayout) findViewById(R.id.root_layout);
+		contentView_ = findViewById(R.id.iv_background_image);
+		colorPicker_ = (ColorPicker) findViewById(R.id.color_picker);
+		colorPicker_.setColorChangedListener(new ColorPicker.ColorChangedListener() {
+			@Override
+			public void onColorChanged(int color) {
+				if (overlayTextView_ != null) {
+					overlayTextView_.setTextColor(color);
+				}
+			}
+		});
+
+		Button changeTextButton = (Button) findViewById(R.id.btn_change_text);
+
+		changeTextClickListener_ = new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (overlayTextView_ == null) {
+					initiateOverlayTextView();
+				}
+				overlayTextView_.requestFocus();
+				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				inputMethodManager.toggleSoftInputFromWindow(overlayTextView_.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+			}
+		};
+
+		changeTextButton.setOnClickListener(changeTextClickListener_);
+	}
+
+	private void initiateOverlayTextView() {
+		overlayTextView_ = new EditText(getBaseContext());
+		overlayTextView_.setTextSize(50);
+		overlayTextView_.setText("asdasda");
+		overlayTextView_.setGravity(Gravity.CENTER);
+		overlayTextView_.setWidth(contentView_.getWidth());
+		overlayTextView_.setHeight(contentView_.getHeight());
+		overlayTextView_.setTextColor(colorPicker_.getSelectedColor());
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) contentView_.getLayoutParams();
+		overlayTextView_.setLayoutParams(layoutParams);
+		rootView_.addView(overlayTextView_);
 	}
 
 	@Override
