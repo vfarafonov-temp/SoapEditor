@@ -10,28 +10,47 @@
 				android:paddingBottom="@dimen/activity_vertical_margin"
 				tools:context=".MainActivity">
 
-	<ImageView
-		android:id="@+id/iv_background_image"
+	<FrameLayout
+		android:id="@+id/content_layout"
 		android:layout_width="@dimen/back_image_width"
 		android:layout_height="@dimen/back_image_height"
-		android:src="@drawable/android_cool"
 		android:layout_alignParentTop="true"
-		android:layout_centerHorizontal="true"
-		android:scaleType="centerCrop"/>
+		android:layout_centerHorizontal="true">
+
+		<ImageView
+			android:id="@+id/iv_background_image"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:src="@drawable/android_cool"
+			android:scaleType="centerCrop"/>
+	</FrameLayout>
+
 
 	<Button
 		android:id="@+id/btn_change_text"
-		android:layout_width="match_parent"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_below="@+id/iv_background_image"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true"
+		android:layout_below="@+id/content_layout"
 		android:text="Change text"/>
+
+	<Button
+		android:id="@+id/btn_move_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentEnd="true"
+		android:focusable="true"
+		android:focusableInTouchMode="true"
+		android:layout_below="@+id/content_layout"
+		android:text="@string/start_resizing"/>
 
 	<FrameLayout
 		android:id="@+id/color_picker_layout"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@+id/btn_change_text"
-		android:background="@android:color/holo_green_light">
+		android:layout_below="@+id/btn_change_text">
 		<com.weezlabs.soapeditor.ColorPicker
 			android:id="@+id/color_picker"
 			android:layout_width="match_parent"

@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,12 +14,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
 
 	private View.OnClickListener changeTextClickListener_;
-	private RelativeLayout rootView_;
+	private FrameLayout contentLayout_;
 	private View contentView_;
 	private EditText overlayTextView_;
 	private ColorPicker colorPicker_;
@@ -32,12 +34,14 @@ public class MainActivity extends AppCompatActivity {
 			return false;
 		}
 	};
+	private Button resizeTextButton_;
+	private boolean isResizing_;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		rootView_ = (RelativeLayout) findViewById(R.id.root_layout);
+		contentLayout_ = (FrameLayout) findViewById(R.id.content_layout);
 		contentView_ = findViewById(R.id.iv_background_image);
 		colorPicker_ = (ColorPicker) findViewById(R.id.color_picker);
 		colorPicker_.setOnTouchListener(pickersTouchListener_);
@@ -54,13 +58,31 @@ public class MainActivity extends AppCompatActivity {
 		fontPicker_.setFontChangedListener(new FontPicker.FontChangedListener() {
 			@Override
 			public void onFontChanged(Typeface typeface) {
-				if (overlayTextView_ != null){
+				if (overlayTextView_ != null) {
 					overlayTextView_.setTypeface(typeface);
 				}
 			}
 		});
 
-		Button changeTextButton = (Button) findViewById(R.id.btn_change_text);
+		resizeTextButton_ = (Button)findViewById(R.id.btn_move_text);
+		resizeTextButton_.setOnTouchListener(pickersTouchListener_);
+		resizeTextButton_.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (isResizing_){
+					resizeTextButton_.setText(getBaseContext().getResources().getString(R.string.start_resizing));
+					if (overlayTextView_ != null){
+						overlayTextView_.setOnTouchListener(null);
+					}
+				} else {
+					resizeTextButton_.setText(getBaseContext().getResources().getString(R.string.stop_resizing));
+					if (overlayTextView_ != null){
+						overlayTextView_.setOnTouchListener(new ResizeTouchListener());
+					}
+				}
+				isResizing_ = !isResizing_;
+			}
+		});
 
 		changeTextClickListener_ = new View.OnClickListener() {
 			@Override
@@ -73,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 				inputMethodManager.toggleSoftInputFromWindow(overlayTextView_.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
 			}
 		};
-
+		Button changeTextButton = (Button) findViewById(R.id.btn_change_text);
 		changeTextButton.setOnClickListener(changeTextClickListener_);
 	}
 
@@ -82,19 +104,23 @@ public class MainActivity extends AppCompatActivity {
 		inputMethodManager.hideSoftInputFromWindow(windowToken, 0);
 	}
 
+	/**
+	 * Creates and adds EditText for text overlapping
+	 */
 	private void initiateOverlayTextView() {
 		overlayTextView_ = new EditText(getBaseContext());
 		overlayTextView_.setTextSize(50);
 		overlayTextView_.setBackground(null);
 		overlayTextView_.setText("asdasda");
 		overlayTextView_.setGravity(Gravity.CENTER);
-		overlayTextView_.setWidth(contentView_.getWidth());
-		overlayTextView_.setHeight(contentView_.getHeight());
+		overlayTextView_.setSingleLine(true);
+		overlayTextView_.setEllipsize(TextUtils.TruncateAt.END);
 		overlayTextView_.setTextColor(colorPicker_.getSelectedColor());
 		overlayTextView_.setTypeface(fontPicker_.getSelectedFont());
-		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) contentView_.getLayoutParams();
+		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		layoutParams.setMargins(contentView_.getLeft(), contentView_.getTop(), 0, 0);
 		overlayTextView_.setLayoutParams(layoutParams);
-		rootView_.addView(overlayTextView_);
+		contentLayout_.addView(overlayTextView_);
 	}
 
 	@Override
