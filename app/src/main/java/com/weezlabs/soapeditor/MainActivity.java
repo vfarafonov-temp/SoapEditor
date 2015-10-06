@@ -64,20 +64,20 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
-		resizeTextButton_ = (Button)findViewById(R.id.btn_move_text);
+		resizeTextButton_ = (Button) findViewById(R.id.btn_move_text);
 		resizeTextButton_.setOnTouchListener(pickersTouchListener_);
 		resizeTextButton_.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (isResizing_){
+				if (isResizing_) {
 					resizeTextButton_.setText(getBaseContext().getResources().getString(R.string.start_resizing));
-					if (overlayTextView_ != null){
+					if (overlayTextView_ != null) {
 						overlayTextView_.setOnTouchListener(null);
 					}
 				} else {
 					resizeTextButton_.setText(getBaseContext().getResources().getString(R.string.stop_resizing));
-					if (overlayTextView_ != null){
-						overlayTextView_.setOnTouchListener(new ResizeTouchListener());
+					if (overlayTextView_ != null) {
+						overlayTextView_.setOnTouchListener(resizeTouchListener_);
 					}
 				}
 				isResizing_ = !isResizing_;
@@ -98,6 +98,49 @@ public class MainActivity extends AppCompatActivity {
 		Button changeTextButton = (Button) findViewById(R.id.btn_change_text);
 		changeTextButton.setOnClickListener(changeTextClickListener_);
 	}
+
+	private ResizeTouchListener resizeTouchListener_ = new ResizeTouchListener(new ResizeTouchListener.OnChangesGesturesListener() {
+		public float initialRotation_;
+		private int initialMarginRight_;
+		private int initialMarginBottom_;
+		private int initialMarginLeft_;
+		private int initialMarginTop_;
+		private FrameLayout.LayoutParams textParams_;
+
+		@Override
+		public void onDragGestureReset() {
+			if (overlayTextView_ != null) {
+				textParams_ = (FrameLayout.LayoutParams) overlayTextView_.getLayoutParams();
+				initialMarginTop_ = textParams_.topMargin;
+				initialMarginLeft_ = textParams_.leftMargin;
+				initialMarginBottom_ = textParams_.bottomMargin;
+				initialMarginRight_ = textParams_.rightMargin;
+			}
+		}
+
+		@Override
+		public void onRotateGestureReset() {
+			initialRotation_ = overlayTextView_.getRotation();
+		}
+
+		@Override
+		public void onDrag(int dragX, int dragY) {
+			if (overlayTextView_ != null && textParams_ != null) {
+				textParams_.leftMargin = initialMarginLeft_ + dragX;
+				textParams_.rightMargin = initialMarginRight_ - dragX;
+				textParams_.topMargin = initialMarginTop_ + dragY;
+				textParams_.bottomMargin = initialMarginBottom_ - dragY;
+				overlayTextView_.setLayoutParams(textParams_);
+			}
+		}
+
+		@Override
+		public void onRotate(int degrees) {
+			if (overlayTextView_ != null) {
+				overlayTextView_.setRotation(initialRotation_ - degrees);
+			}
+		}
+	});
 
 	private void hideKeyboard(IBinder windowToken) {
 		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
