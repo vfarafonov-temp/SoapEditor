@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private ResizeTouchListener resizeTouchListener_ = new ResizeTouchListener(new ResizeTouchListener.OnChangesGesturesListener() {
+		public float initialScale_;
 		public float initialRotation_;
 		private int initialMarginRight_;
 		private int initialMarginBottom_;
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		public void onRotateGestureReset() {
 			initialRotation_ = overlayTextView_.getRotation();
+			initialScale_ = overlayTextView_.getScaleX();
 		}
 
 		@Override
@@ -138,6 +140,14 @@ public class MainActivity extends AppCompatActivity {
 		public void onRotate(int degrees) {
 			if (overlayTextView_ != null) {
 				overlayTextView_.setRotation(initialRotation_ - degrees);
+			}
+		}
+
+		@Override
+		public void onZoom(float zoom) {
+			if (overlayTextView_ != null) {
+				overlayTextView_.setScaleX(initialScale_ * zoom);
+				overlayTextView_.setScaleY(initialScale_ * zoom);
 			}
 		}
 	});

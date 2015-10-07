@@ -5,9 +5,13 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * Created by vfarafonov on 05.10.2015.
+ * Touch listener for detecting drag, scale and rotate gestures. Performs check for min scale value ({@link ResizeTouchListener#MIN_SCALE}).
+ * Uses scale multiplier {@link ResizeTouchListener#SCALE_MULTIPLIER}. For callback use {@link com.weezlabs.soapeditor.ResizeTouchListener.OnChangesGesturesListener}
  */
 public class ResizeTouchListener implements View.OnTouchListener {
+	public static final int SCALE_MULTIPLIER = 2;
+	public static final float MIN_SCALE = 0.2f;
+
 	private static final int NONE = 0;
 	private static final int DRAG = 1;
 	private static final int ZOOM = 2;
@@ -18,10 +22,12 @@ public class ResizeTouchListener implements View.OnTouchListener {
 	private int pointerOneId_ = -1;
 	private int pointerTwoId_ = -1;
 	private OnChangesGesturesListener listener_;
-	private PointF firstPointerS_ = new PointF();
-	private PointF secondPointerF_ = new PointF();
-	private PointF newFirstPointerS_ = new PointF();
-	private PointF newSecondPointerF_ = new PointF();
+	private PointF firstPointer_ = new PointF();
+	private PointF secondPointer_ = new PointF();
+	private PointF newFirstPointer_ = new PointF();
+	private PointF newSecondPointer_ = new PointF();
+	private float distance_;
+	private float lastScale_;
 
 	public ResizeTouchListener(OnChangesGesturesListener listener) {
 		this.listener_ = listener;
@@ -42,8 +48,10 @@ public class ResizeTouchListener implements View.OnTouchListener {
 				if (pointerTwoId_ == -1) {
 					pointerTwoId_ = event.getPointerId(event.getActionIndex());
 					mode_ = ZOOM;
-					getRawCoordinates(v, event, pointerOneId_, firstPointerS_);
-					getRawCoordinates(v, event, pointerTwoId_, secondPointerF_);
+					getRawCoordinates(v, event, pointerOneId_, firstPointer_);
+					getRawCoordinates(v, event, pointerTwoId_, secondPointer_);
+					distance_ = calculateDistance(firstPointer_.x, firstPointer_.y, secondPointer_.x, secondPointer_.y);
+					lastScale_ = 1;
 					if (listener_ != null) {
 						listener_.onRotateGestureReset();
 					}
@@ -56,7 +64,7 @@ public class ResizeTouchListener implements View.OnTouchListener {
 					if (pointerId == pointerOneId_) {
 						// Released first pointer so we need to use second as first
 						pointerOneId_ = pointerTwoId_;
-						getRawCoordinates(v, event, pointerOneId_, firstPointerS_);
+						getRawCoordinates(v, event, pointerOneId_, firstPointer_);
 					}
 					pointerTwoId_ = -1;
 					if (event.getPointerCount() > 2) {
@@ -72,7 +80,8 @@ public class ResizeTouchListener implements View.OnTouchListener {
 					}
 					if (pointerTwoId_ != -1) {
 						// We replaced second pointer with another
-						getRawCoordinates(v, event, pointerTwoId_, secondPointerF_);
+						getRawCoordinates(v, event, pointerTwoId_, secondPointer_);
+						distance_ = calculateDistance(firstPointer_.x, firstPointer_.y, secondPointer_.x, secondPointer_.y);
 						if (listener_ != null) {
 							listener_.onRotateGestureReset();
 						}
@@ -102,11 +111,19 @@ public class ResizeTouchListener implements View.OnTouchListener {
 						listener_.onDrag((int) deltaX, (int) deltaY);
 					}
 				} else if (mode_ == ZOOM) {
-					getRawCoordinates(v, event, pointerOneId_, newFirstPointerS_);
-					getRawCoordinates(v, event, pointerTwoId_, newSecondPointerF_);
-					int angle = (int) calculateAngle(secondPointerF_.x, secondPointerF_.y, firstPointerS_.x, firstPointerS_.y, newSecondPointerF_.x, newSecondPointerF_.y, newFirstPointerS_.x, newFirstPointerS_.y);
+					getRawCoordinates(v, event, pointerOneId_, newFirstPointer_);
+					getRawCoordinates(v, event, pointerTwoId_, newSecondPointer_);
+					int angle = (int) calculateAngle(secondPointer_.x, secondPointer_.y, firstPointer_.x, firstPointer_.y, newSecondPointer_.x, newSecondPointer_.y, newFirstPointer_.x, newFirstPointer_.y);
 					if (listener_ != null) {
 						listener_.onRotate(angle);
+					}
+					float currentDistance = calculateDistance(newFirstPointer_.x, newFirstPointer_.y, newSecondPointer_.x, newSecondPointer_.y);
+					if (Math.abs(currentDistance - distance_) > 0 && listener_ != null) {
+						lastScale_ = lastScale_ * currentDistance / distance_;
+						lastScale_ = (lastScale_ - 1) * SCALE_MULTIPLIER + 1;
+						if (!(lastScale_ * v.getScaleX() < MIN_SCALE)) {
+							listener_.onZoom(lastScale_);
+						}
 					}
 				}
 				break;
@@ -123,7 +140,6 @@ public class ResizeTouchListener implements View.OnTouchListener {
 		int pointerIndex = event.findPointerIndex(pointerId);
 		int location[] = {0, 0};
 		v.getLocationOnScreen(location);
-
 		float x = event.getX(pointerIndex);
 		float y = event.getY(pointerIndex);
 
@@ -148,20 +164,43 @@ public class ResizeTouchListener implements View.OnTouchListener {
 		return (float) ((Math.toDegrees(angleOne - angleTwo)) % 360);
 	}
 
-	private float calculateDistance(MotionEvent event) {
-		float x = event.getX(0) - event.getX(1);
-		float y = event.getY(0) - event.getY(1);
+	/**
+	 * Calculates distance between two points by coordinates
+	 */
+	private float calculateDistance(float x1, float y1, float x2, float y2) {
+		float x = x2 - x1;
+		float y = y2 - y1;
 		return (float) Math.sqrt(x * x + y * y);
 	}
 
+	/**
+	 * Interface for handling {@link ResizeTouchListener} callbacks
+	 */
 	public interface OnChangesGesturesListener {
+		/**
+		 * Place for reset initial dragging params like margins
+		 */
 		void onDragGestureReset();
 
+		/**
+		 * Used for resetting rotation and scale gesture params
+		 */
 		void onRotateGestureReset();
 
+		/**
+		 * Detected drag gesture
+		 */
 		void onDrag(int dragX, int dragY);
 
+		/**
+		 * Detected rotation
+		 */
 		void onRotate(int degrees);
+
+		/**
+		 * Detected zoom gesture
+		 */
+		void onZoom(float zoom);
 	}
 
 	public void setListener(OnChangesGesturesListener listener) {
