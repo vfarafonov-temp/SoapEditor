@@ -3,9 +3,12 @@ package com.weezlabs.soapeditor;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +22,7 @@ import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
 
+	private static final String STATE_TEXT_OVERLAY = "STATE_TEXT_OVERLAY";
 	private View.OnClickListener changeTextClickListener_;
 	private FrameLayout contentLayout_;
 	private View contentView_;
@@ -36,11 +40,17 @@ public class MainActivity extends AppCompatActivity {
 	};
 	private Button resizeTextButton_;
 	private boolean isResizing_;
+	private TextOverlay textOverlay_;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		if (savedInstanceState == null) {
+			textOverlay_ = new TextOverlay();
+		} else {
+			textOverlay_ = savedInstanceState.getParcelable(STATE_TEXT_OVERLAY);
+		}
 		contentLayout_ = (FrameLayout) findViewById(R.id.content_layout);
 		contentView_ = findViewById(R.id.iv_background_image);
 		colorPicker_ = (ColorPicker) findViewById(R.id.color_picker);
@@ -50,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 			public void onColorChanged(int color) {
 				if (overlayTextView_ != null) {
 					overlayTextView_.setTextColor(color);
+					textOverlay_.setColor(color);
 				}
 			}
 		});
@@ -57,9 +68,10 @@ public class MainActivity extends AppCompatActivity {
 		fontPicker_.setOnTouchListener(pickersTouchListener_);
 		fontPicker_.setFontChangedListener(new FontPicker.FontChangedListener() {
 			@Override
-			public void onFontChanged(Typeface typeface) {
+			public void onFontChanged(String fontName, Typeface typeface) {
 				if (overlayTextView_ != null) {
 					overlayTextView_.setTypeface(typeface);
+					textOverlay_.setFont(fontName);
 				}
 			}
 		});
@@ -102,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
 	private ResizeTouchListener resizeTouchListener_ = new ResizeTouchListener(new ResizeTouchListener.OnChangesGesturesListener() {
 		public float initialScale_;
 		public float initialRotation_;
-		private int initialMarginRight_;
-		private int initialMarginBottom_;
 		private int initialMarginLeft_;
 		private int initialMarginTop_;
 		private FrameLayout.LayoutParams textParams_;
@@ -114,8 +124,6 @@ public class MainActivity extends AppCompatActivity {
 				textParams_ = (FrameLayout.LayoutParams) overlayTextView_.getLayoutParams();
 				initialMarginTop_ = textParams_.topMargin;
 				initialMarginLeft_ = textParams_.leftMargin;
-				initialMarginBottom_ = textParams_.bottomMargin;
-				initialMarginRight_ = textParams_.rightMargin;
 			}
 		}
 
@@ -129,10 +137,9 @@ public class MainActivity extends AppCompatActivity {
 		public void onDrag(int dragX, int dragY) {
 			if (overlayTextView_ != null && textParams_ != null) {
 				textParams_.leftMargin = initialMarginLeft_ + dragX;
-				textParams_.rightMargin = initialMarginRight_ - dragX;
 				textParams_.topMargin = initialMarginTop_ + dragY;
-				textParams_.bottomMargin = initialMarginBottom_ - dragY;
 				overlayTextView_.setLayoutParams(textParams_);
+				textOverlay_.setLocation(new float[]{((float) textParams_.leftMargin) / contentView_.getWidth(), ((float) textParams_.topMargin) / contentView_.getHeight()});
 			}
 		}
 
@@ -140,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
 		public void onRotate(int degrees) {
 			if (overlayTextView_ != null) {
 				overlayTextView_.setRotation(initialRotation_ - degrees);
+				textOverlay_.setRotation(initialRotation_ - degrees);
 			}
 		}
 
@@ -148,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
 			if (overlayTextView_ != null) {
 				overlayTextView_.setScaleX(initialScale_ * zoom);
 				overlayTextView_.setScaleY(initialScale_ * zoom);
+				textOverlay_.setScale(initialScale_ * zoom);
 			}
 		}
 	});
@@ -157,6 +166,19 @@ public class MainActivity extends AppCompatActivity {
 		inputMethodManager.hideSoftInputFromWindow(windowToken, 0);
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (!TextOverlay.isDefault(textOverlay_) && overlayTextView_ == null) {
+			new Handler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					initiateOverlayTextView();
+				}
+			}, 500);
+		}
+	}
+
 	/**
 	 * Creates and adds EditText for text overlapping
 	 */
@@ -164,16 +186,64 @@ public class MainActivity extends AppCompatActivity {
 		overlayTextView_ = new EditText(getBaseContext());
 		overlayTextView_.setTextSize(50);
 		overlayTextView_.setBackground(null);
-		overlayTextView_.setText("asdasda");
 		overlayTextView_.setGravity(Gravity.CENTER);
 		overlayTextView_.setSingleLine(true);
 		overlayTextView_.setEllipsize(TextUtils.TruncateAt.END);
-		overlayTextView_.setTextColor(colorPicker_.getSelectedColor());
-		overlayTextView_.setTypeface(fontPicker_.getSelectedFont());
-		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		layoutParams.setMargins(contentView_.getLeft(), contentView_.getTop(), 0, 0);
-		overlayTextView_.setLayoutParams(layoutParams);
+		restoreTextOverlayFromModel(overlayTextView_, textOverlay_, contentView_);
 		contentLayout_.addView(overlayTextView_);
+
+		overlayTextView_.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				textOverlay_.setText(s.toString());
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+
+			}
+		});
+
+		colorPicker_.setColor(textOverlay_.getColor());
+		fontPicker_.setSelectedFont(textOverlay_.getFont());
+	}
+
+	/**
+	 * Sets updates EditText with {@link TextOverlay} model and place it relative to view with content
+	 */
+	private void restoreTextOverlayFromModel(EditText overlayTextView, TextOverlay textOverlay, View contentView) {
+		overlayTextView.setText(textOverlay.getText());
+		overlayTextView.setScaleX(textOverlay.getScale());
+		overlayTextView.setScaleY(textOverlay.getScale());
+		overlayTextView.setRotation(textOverlay.getRotation());
+		overlayTextView.setTextColor(textOverlay.getColor());
+
+		Typeface typeface = null;
+		try {
+			typeface = Typeface.createFromAsset(getAssets(), FontPicker.FONTS_PATH + "/" + textOverlay.getFont());
+		} catch (Exception e) {
+			// Do nothing. Font just nor found
+		} finally {
+			if (typeface == null) {
+				typeface = Typeface.DEFAULT_BOLD;
+			}
+		}
+		overlayTextView.setTypeface(typeface);
+
+		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+		layoutParams.leftMargin = (int) (contentView.getWidth() * textOverlay.getLocation()[0]);
+		layoutParams.rightMargin = Integer.MIN_VALUE / 4;
+
+		layoutParams.topMargin = (int) (contentView.getHeight() * textOverlay.getLocation()[1]);
+		layoutParams.bottomMargin = Integer.MIN_VALUE / 4;
+
+		overlayTextView.setLayoutParams(layoutParams);
 	}
 
 	@Override
@@ -196,5 +266,11 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable(STATE_TEXT_OVERLAY, textOverlay_);
 	}
 }

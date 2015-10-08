@@ -150,6 +150,21 @@ public class ColorPicker extends View {
 	}
 
 	/**
+	 * Sets new color and notifies listeners
+	 */
+	public void setColor(int color) {
+		float[] colors = new float[3];
+		Color.colorToHSV(color, colors);
+		currentProgress_ = (360 - colors[0]) / 360;
+		currentColor_ = getColorFromProgress(currentProgress_);
+		circleFillPaint_.setColor(currentColor_);
+		if (colorChangedListener_ != null) {
+			colorChangedListener_.onColorChanged(currentColor_);
+		}
+		invalidate();
+	}
+
+	/**
 	 * Calculates value between two values with given fraction
 	 */
 	private static int average(int left, int right, float fraction) {

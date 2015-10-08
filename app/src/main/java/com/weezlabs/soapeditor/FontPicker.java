@@ -73,10 +73,23 @@ public class FontPicker extends ListView {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				adapter_.setSelectedItem(position);
 				if (fontChangedListener_ != null) {
-					fontChangedListener_.onFontChanged(getSelectedFont());
+					fontChangedListener_.onFontChanged(getSelectedFontName(), getSelectedFont());
 				}
 			}
 		});
+	}
+
+	private String getSelectedFontName() {
+		return adapter_.getSelectedItem();
+	}
+
+	public void setSelectedFont(String fontName) {
+		ArrayList<String> fontsList = new ArrayList<>();
+		fontsList.addAll(fontsMap_.keySet());
+		int index = fontsList.indexOf(fontName);
+		if (index != -1) {
+			adapter_.setSelectedItem(index);
+		}
 	}
 
 	public Typeface getSelectedFont() {
@@ -137,7 +150,7 @@ public class FontPicker extends ListView {
 	}
 
 	public interface FontChangedListener {
-		void onFontChanged(Typeface typeface);
+		void onFontChanged(String fontName, Typeface typeface);
 	}
 
 	public void setFontChangedListener(FontChangedListener fontChangedListener) {
