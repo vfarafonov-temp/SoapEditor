@@ -38,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
 	private Button resizeTextButton_;
 	private boolean isResizing_;
 	private TextOverlay textOverlay_;
+	private boolean isEditingText_;
+	private Button changeDrawingButton_;
+	private Button exitButton_;
+	private Button changeTextButton_;
+	private boolean isEditingDrawing_;
+	private Button clearDrawingButton_;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,22 +99,72 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
+		changeDrawingButton_ = (Button) findViewById(R.id.btn_change_drawing);
+		clearDrawingButton_ = (Button) findViewById(R.id.btn_clear_drawing);
+		exitButton_ = (Button) findViewById(R.id.btn_exit);
+
 		changeTextClickListener_ = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (isResizing_){
-					resizeTextButton_.callOnClick();
+				if (isEditingText_) {
+					if (isResizing_) {
+						resizeTextButton_.callOnClick();
+					}
+					if (overlayTextView_ == null) {
+						initiateOverlayEditText();
+					}
+					overlayTextView_.requestFocus();
+					InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					inputMethodManager.toggleSoftInputFromWindow(overlayTextView_.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+				} else {
+					isEditingText_ = true;
+					showEditTextLayout();
 				}
-				if (overlayTextView_ == null) {
-					initiateOverlayEditText();
-				}
-				overlayTextView_.requestFocus();
-				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				inputMethodManager.toggleSoftInputFromWindow(overlayTextView_.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
 			}
 		};
-		Button changeTextButton = (Button) findViewById(R.id.btn_change_text);
-		changeTextButton.setOnClickListener(changeTextClickListener_);
+		changeTextButton_ = (Button) findViewById(R.id.btn_change_text);
+		changeTextButton_.setOnClickListener(changeTextClickListener_);
+
+		changeDrawingButton_.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				isEditingDrawing_ = true;
+				showEditDrawingButtons();
+			}
+		});
+
+		exitButton_.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				isEditingDrawing_ = false;
+				isEditingText_ = false;
+				showBasicButtons();
+			}
+		});
+	}
+
+	private void showBasicButtons() {
+		changeTextButton_.setVisibility(View.VISIBLE);
+		clearDrawingButton_.setVisibility(View.GONE);
+		exitButton_.setVisibility(View.GONE);
+		changeDrawingButton_.setVisibility(View.VISIBLE);
+		resizeTextButton_.setVisibility(View.GONE);
+		colorPicker_.setVisibility(View.GONE);
+		fontPicker_.setVisibility(View.GONE);
+	}
+
+	private void showEditDrawingButtons() {
+		changeTextButton_.setVisibility(View.GONE);
+		clearDrawingButton_.setVisibility(View.VISIBLE);
+		exitButton_.setVisibility(View.VISIBLE);
+	}
+
+	private void showEditTextLayout() {
+		changeDrawingButton_.setVisibility(View.GONE);
+		resizeTextButton_.setVisibility(View.VISIBLE);
+		exitButton_.setVisibility(View.VISIBLE);
+		colorPicker_.setVisibility(View.VISIBLE);
+		fontPicker_.setVisibility(View.VISIBLE);
 	}
 
 	private ResizeTouchListener resizeTouchListener_ = new ResizeTouchListener(new ResizeTouchListener.OnChangesGesturesListener() {

@@ -25,54 +25,74 @@
 			android:scaleType="centerCrop"/>
 	</FrameLayout>
 
-
-	<Button
-		android:id="@+id/btn_change_text"
-		android:layout_width="wrap_content"
+	<LinearLayout
+		android:id="@+id/buttons_layout"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentStart="true"
-		android:layout_below="@+id/content_layout"
-		android:text="Change text"/>
+		android:layout_below="@+id/content_layout">
 
-	<Button
-		android:id="@+id/btn_move_text"
-		android:layout_width="wrap_content"
+		<Button
+			android:id="@+id/btn_change_text"
+			android:layout_width="wrap_content"
+			android:layout_weight="1"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:text="@string/change_text"/>
+
+		<Button
+			android:id="@+id/btn_move_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:focusable="true"
+			android:focusableInTouchMode="true"
+			android:text="@string/start_resizing"
+			android:visibility="gone"/>
+
+		<Button
+			android:id="@+id/btn_change_drawing"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:text="@string/change_drawing"/>
+
+		<Button
+			android:id="@+id/btn_clear_drawing"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:text="@string/clear"
+			android:visibility="gone"/>
+
+		<Button
+			android:id="@+id/btn_exit"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:text="@string/exit"
+			android:visibility="gone"/>
+	</LinearLayout>
+
+	<com.weezlabs.soapeditor.ColorPicker
+		android:id="@+id/color_picker"
+		android:layout_below="@+id/buttons_layout"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_alignParentRight="true"
-		android:layout_alignParentEnd="true"
 		android:focusable="true"
 		android:focusableInTouchMode="true"
-		android:layout_below="@+id/content_layout"
-		android:text="@string/start_resizing"/>
+		custom:line_thickness="10dp"
+		custom:picker_radius="15dp"
+		custom:progress="0.5"
+		android:padding="5dp"
+		android:visibility="gone"/>
 
-	<FrameLayout
-		android:id="@+id/color_picker_layout"
+	<com.weezlabs.soapeditor.FontPicker
+		android:id="@+id/font_picker"
+		android:layout_below="@+id/color_picker"
+		android:focusable="true"
+		android:focusableInTouchMode="true"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@+id/btn_change_text">
-		<com.weezlabs.soapeditor.ColorPicker
-			android:id="@+id/color_picker"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:focusable="true"
-			android:focusableInTouchMode="true"
-			custom:line_thickness="10dp"
-			custom:picker_radius="15dp"
-			custom:progress="0.5"
-			android:padding="5dp"/>
-	</FrameLayout>
-
-	<FrameLayout
-		android:layout_width="match_parent"
-		android:layout_height="fill_parent"
-		android:layout_below="@+id/color_picker_layout">
-		<com.weezlabs.soapeditor.FontPicker
-			android:id="@+id/font_picker"
-			android:focusable="true"
-			android:focusableInTouchMode="true"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
-	</FrameLayout>
+		android:visibility="gone"/>
 
 </RelativeLayout>
