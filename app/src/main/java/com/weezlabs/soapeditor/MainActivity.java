@@ -96,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
 		changeTextClickListener_ = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (isResizing_){
+					resizeTextButton_.callOnClick();
+				}
 				if (overlayTextView_ == null) {
 					initiateOverlayEditText();
 				}
