@@ -7,9 +7,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -18,7 +16,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -100,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				if (overlayTextView_ == null) {
-					initiateOverlayTextView();
+					initiateOverlayEditText();
 				}
 				overlayTextView_.requestFocus();
 				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -173,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 			new Handler().postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					initiateOverlayTextView();
+					initiateOverlayEditText();
 				}
 			}, 500);
 		}
@@ -182,16 +179,9 @@ public class MainActivity extends AppCompatActivity {
 	/**
 	 * Creates and adds EditText for text overlapping
 	 */
-	private void initiateOverlayTextView() {
-		overlayTextView_ = new EditText(getBaseContext());
-		overlayTextView_.setTextSize(50);
-		overlayTextView_.setBackground(null);
-		overlayTextView_.setGravity(Gravity.CENTER);
-		overlayTextView_.setSingleLine(true);
-		overlayTextView_.setEllipsize(TextUtils.TruncateAt.END);
-		restoreTextOverlayFromModel(overlayTextView_, textOverlay_, contentView_);
+	private void initiateOverlayEditText() {
+		overlayTextView_ = TextOverlay.createOverlayEditText(this, textOverlay_, contentView_);
 		contentLayout_.addView(overlayTextView_);
-
 		overlayTextView_.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -211,39 +201,6 @@ public class MainActivity extends AppCompatActivity {
 
 		colorPicker_.setColor(textOverlay_.getColor());
 		fontPicker_.setSelectedFont(textOverlay_.getFont());
-	}
-
-	/**
-	 * Sets updates EditText with {@link TextOverlay} model and place it relative to view with content
-	 */
-	private void restoreTextOverlayFromModel(EditText overlayTextView, TextOverlay textOverlay, View contentView) {
-		overlayTextView.setText(textOverlay.getText());
-		overlayTextView.setScaleX(textOverlay.getScale());
-		overlayTextView.setScaleY(textOverlay.getScale());
-		overlayTextView.setRotation(textOverlay.getRotation());
-		overlayTextView.setTextColor(textOverlay.getColor());
-
-		Typeface typeface = null;
-		try {
-			typeface = Typeface.createFromAsset(getAssets(), FontPicker.FONTS_PATH + "/" + textOverlay.getFont());
-		} catch (Exception e) {
-			// Do nothing. Font just nor found
-		} finally {
-			if (typeface == null) {
-				typeface = Typeface.DEFAULT_BOLD;
-			}
-		}
-		overlayTextView.setTypeface(typeface);
-
-		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-		layoutParams.leftMargin = (int) (contentView.getWidth() * textOverlay.getLocation()[0]);
-		layoutParams.rightMargin = Integer.MIN_VALUE / 4;
-
-		layoutParams.topMargin = (int) (contentView.getHeight() * textOverlay.getLocation()[1]);
-		layoutParams.bottomMargin = Integer.MIN_VALUE / 4;
-
-		overlayTextView.setLayoutParams(layoutParams);
 	}
 
 	@Override
