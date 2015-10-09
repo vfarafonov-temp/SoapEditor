@@ -75,7 +75,7 @@
 			android:visibility="gone"/>
 	</LinearLayout>
 
-	<com.weezlabs.soapeditor.ColorPicker
+	<com.weezlabs.soapeditor.views.ColorPicker
 		android:id="@+id/color_picker"
 		android:layout_below="@+id/buttons_layout"
 		android:layout_width="match_parent"
@@ -88,7 +88,7 @@
 		android:padding="5dp"
 		android:visibility="gone"/>
 
-	<com.weezlabs.soapeditor.FontPicker
+	<com.weezlabs.soapeditor.views.FontPicker
 		android:id="@+id/font_picker"
 		android:layout_below="@+id/color_picker"
 		android:focusable="true"

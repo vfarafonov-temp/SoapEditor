@@ -1,4 +1,4 @@
-package com.weezlabs.soapeditor;
+package com.weezlabs.soapeditor.models;
 
 import android.graphics.Color;
 import android.os.Parcel;

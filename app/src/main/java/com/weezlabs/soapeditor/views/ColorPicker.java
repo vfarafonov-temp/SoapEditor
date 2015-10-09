@@ -1,4 +1,4 @@
-package com.weezlabs.soapeditor;
+package com.weezlabs.soapeditor.views;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -11,6 +11,8 @@ import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.weezlabs.soapeditor.R;
 
 /**
  * Created by vfarafonov on 30.09.2015.

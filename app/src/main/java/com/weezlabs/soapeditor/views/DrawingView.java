@@ -1,4 +1,4 @@
-package com.weezlabs.soapeditor;
+package com.weezlabs.soapeditor.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,6 +8,8 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.weezlabs.soapeditor.models.DrawingOverlay;
 
 import java.util.LinkedList;
 

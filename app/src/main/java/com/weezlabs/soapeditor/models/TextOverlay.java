@@ -1,4 +1,4 @@
-package com.weezlabs.soapeditor;
+package com.weezlabs.soapeditor.models;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import com.weezlabs.soapeditor.views.FontPicker;
 
 /**
  * Text overlay model

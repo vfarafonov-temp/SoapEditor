@@ -1,4 +1,4 @@
-package com.weezlabs.soapeditor;
+package com.weezlabs.soapeditor.views;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -12,6 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.weezlabs.soapeditor.R;
 
 import java.io.IOException;
 import java.util.ArrayList;

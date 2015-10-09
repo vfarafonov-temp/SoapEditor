@@ -17,6 +17,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
+import com.weezlabs.soapeditor.models.DrawingOverlay;
+import com.weezlabs.soapeditor.models.TextOverlay;
+import com.weezlabs.soapeditor.views.ColorPicker;
+import com.weezlabs.soapeditor.views.DrawingView;
+import com.weezlabs.soapeditor.views.FontPicker;
+
 public class MainActivity extends AppCompatActivity {
 
 	private static final String STATE_TEXT_OVERLAY = "STATE_TEXT_OVERLAY";
