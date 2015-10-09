@@ -64,6 +64,7 @@ public class FontPicker extends ListView {
 		if (fontsMap_.size() == 0) {
 			fontsMap_.put(DEFAULT_FONT, Typeface.DEFAULT);
 		}
+
 		ArrayList<String> fontsList = new ArrayList<>();
 		fontsList.addAll(fontsMap_.keySet());
 		adapter_ = new FontsArrayAdapter(getContext(), fontsList);
