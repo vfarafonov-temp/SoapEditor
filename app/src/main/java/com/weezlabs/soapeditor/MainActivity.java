@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
 				} else {
 					if (overlayTextView_ != null) {
 						setTextOverlayEditable(true);
+						overlayTextView_.setBackground(getBaseContext().getResources().getDrawable(R.drawable.text_border));
 					}
 					isEditingText_ = true;
 					showEditTextLayout();
@@ -150,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
 				showBasicButtons();
 				if (overlayTextView_ != null) {
 					setTextOverlayEditable(false);
+					overlayTextView_.setBackground(null);
 					contentView_.requestFocus();
 				}
 			}
@@ -326,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
 	 */
 	private void initiateOverlayEditText() {
 		overlayTextView_ = TextOverlay.createOverlayEditText(this, textOverlay_, contentView_);
+		overlayTextView_.setBackground(getBaseContext().getResources().getDrawable(R.drawable.text_border));
 		overlayTextView_.setClickable(false);
 		contentLayout_.addView(overlayTextView_);
 		overlayTextView_.addTextChangedListener(new TextWatcher() {
