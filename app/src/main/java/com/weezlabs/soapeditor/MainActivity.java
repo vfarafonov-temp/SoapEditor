@@ -213,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
 
 		colorPicker_.setVisibility(View.VISIBLE);
 		colorPicker_.setOnTouchListener(null);
-		colorPicker_.setColor(drawingOverlay_.getColor());
 		colorPicker_.setColorChangedListener(new ColorPicker.ColorChangedListener() {
 			@Override
 			public void onColorChanged(int color) {
@@ -223,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		});
+		colorPicker_.setColor(drawingOverlay_.getColor());
 	}
 
 	private void showEditTextLayout() {
