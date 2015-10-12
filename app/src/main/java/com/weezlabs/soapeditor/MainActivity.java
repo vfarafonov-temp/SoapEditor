@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 				if (overlayTextView_ != null) {
 					overlayTextView_.setTypeface(typeface);
 					textOverlay_.setFont(fontName);
-					overlayTextView_.setFocusable(false);
+					setTextOverlayEditable(false);
 				}
 			}
 		});
@@ -98,9 +98,6 @@ public class MainActivity extends AppCompatActivity {
 					}
 				}
 				isResizing_ = !isResizing_;
-				if (overlayTextView_ != null) {
-					overlayTextView_.setFocusable(false);
-				}
 			}
 		});
 
@@ -116,13 +113,15 @@ public class MainActivity extends AppCompatActivity {
 					}
 					if (overlayTextView_ == null) {
 						initiateOverlayEditText();
-						overlayTextView_.setFocusable(false);
 					}
-					overlayTextView_.setFocusable(false);
+					setTextOverlayEditable(true);
 					overlayTextView_.requestFocus();
 					InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 					inputMethodManager.toggleSoftInputFromWindow(overlayTextView_.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
 				} else {
+					if (overlayTextView_ != null) {
+						setTextOverlayEditable(true);
+					}
 					isEditingText_ = true;
 					showEditTextLayout();
 				}
@@ -145,9 +144,12 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				isEditingText_ = false;
+				if (isResizing_) {
+					resizeTextButton_.callOnClick();
+				}
 				showBasicButtons();
 				if (overlayTextView_ != null) {
-					overlayTextView_.setFocusable(false);
+					setTextOverlayEditable(false);
 					contentView_.requestFocus();
 				}
 			}
@@ -163,6 +165,12 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		});
+	}
+
+	private void setTextOverlayEditable(boolean isEditable) {
+		overlayTextView_.setFocusable(isEditable);
+		overlayTextView_.setFocusableInTouchMode(isEditable);
+		overlayTextView_.setClickable(isEditable);
 	}
 
 	private void initiateOverlayDrawing() {
@@ -319,7 +327,6 @@ public class MainActivity extends AppCompatActivity {
 	private void initiateOverlayEditText() {
 		overlayTextView_ = TextOverlay.createOverlayEditText(this, textOverlay_, contentView_);
 		overlayTextView_.setClickable(false);
-		overlayTextView_.setFocusable(false);
 		contentLayout_.addView(overlayTextView_);
 		overlayTextView_.addTextChangedListener(new TextWatcher() {
 			@Override
