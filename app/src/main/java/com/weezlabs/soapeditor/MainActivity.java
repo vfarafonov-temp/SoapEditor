@@ -328,8 +328,10 @@ public class MainActivity extends AppCompatActivity {
 	 */
 	private void initiateOverlayEditText() {
 		overlayTextView_ = TextOverlay.createOverlayEditText(this, textOverlay_, contentView_);
-		overlayTextView_.setBackground(getBaseContext().getResources().getDrawable(R.drawable.text_border));
-		overlayTextView_.setClickable(false);
+		if (isEditingText_) {
+			overlayTextView_.setBackground(getBaseContext().getResources().getDrawable(R.drawable.text_border));
+		}
+		setTextOverlayEditable(false);
 		contentLayout_.addView(overlayTextView_);
 		overlayTextView_.addTextChangedListener(new TextWatcher() {
 			@Override
