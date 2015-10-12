@@ -13,4 +13,6 @@
 	<string name="overlays">Overlays</string>
 	<string name="text_message">Text message</string>
 	<string name="title_activity_text_message">TextMessage</string>
+	<string name="hint_text_message">What would you like to say?</string>
+	<string name="action_done">Done</string>
 </resources>

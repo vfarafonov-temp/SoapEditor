@@ -26,6 +26,7 @@
             android:name=".TextMessageActivity"
             android:label="@string/title_activity_text_message"
             android:parentActivityName=".HomeActivity"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

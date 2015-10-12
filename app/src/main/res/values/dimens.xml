@@ -4,9 +4,11 @@
 	<dimen name="activity_vertical_margin">16dp</dimen>
 	<dimen name="back_image_width">250dp</dimen>
 	<dimen name="back_image_height">250dp</dimen>
-	<dimen name="picker_radius">10dp</dimen>
-	<dimen name="line_thickness">5dp</dimen>
+	<dimen name="picker_radius">15dp</dimen>
+	<dimen name="line_thickness">10dp</dimen>
 	<dimen name="circle_stroke_thickness">5dp</dimen>
 	<dimen name="font_list_item_padding">10dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
+	<dimen name="icons_padding">5dp</dimen>
+	<dimen name="color_picker_default_padding">5dp</dimen>
 </resources>
