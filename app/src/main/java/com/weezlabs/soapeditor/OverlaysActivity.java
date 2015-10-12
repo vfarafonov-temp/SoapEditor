@@ -23,7 +23,7 @@ import com.weezlabs.soapeditor.views.ColorPicker;
 import com.weezlabs.soapeditor.views.DrawingView;
 import com.weezlabs.soapeditor.views.FontPicker;
 
-public class MainActivity extends AppCompatActivity {
+public class OverlaysActivity extends AppCompatActivity {
 
 	private static final String STATE_TEXT_OVERLAY = "STATE_TEXT_OVERLAY";
 	private static final String STATE_DRAWING_OVERLAY = "STATE_DRAWING_OVERLAY";

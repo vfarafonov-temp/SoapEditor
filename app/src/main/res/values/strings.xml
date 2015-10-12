@@ -9,4 +9,8 @@
 	<string name="change_text">Change text</string>
 	<string name="clear">Clear</string>
 	<string name="change_drawing">Change drawing</string>
+	<string name="title_activity_home">HomeActivity</string>
+	<string name="overlays">Overlays</string>
+	<string name="text_message">Text message</string>
+	<string name="title_activity_text_message">TextMessage</string>
 </resources>
