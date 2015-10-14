@@ -30,7 +30,7 @@ public class TextOverlay implements Parcelable {
 	private float scale_;
 	private float[] location_ = {0f, 0f};
 	private float rotation_;
-	private int color_;
+	private int color_ = DEFAULT_COLOR;
 	private String font_;
 
 	public TextOverlay(String text, float scale, float[] location, float rotation, int color, String font) {

@@ -148,6 +148,9 @@ public class TextToolsView extends FrameLayout {
 						textView.setTextColor(color);
 					}
 				}
+				if (textToolsListener_ != null) {
+					textToolsListener_.onTextColorChanged(color);
+				}
 			}
 		});
 		rootLayout_.addView(colorPicker_);
@@ -169,6 +172,9 @@ public class TextToolsView extends FrameLayout {
 					if (textView != null) {
 						textView.setTypeface(typeface);
 					}
+				}
+				if (textToolsListener_ != null) {
+					textToolsListener_.onFontChanged(fontName, typeface);
 				}
 			}
 		});
@@ -207,6 +213,9 @@ public class TextToolsView extends FrameLayout {
 					if (textView != null) {
 						textView.setBackgroundColor(color);
 					}
+				}
+				if (textToolsListener_ != null) {
+					textToolsListener_.onBackgroundColorChanged(color);
 				}
 			}
 		});
@@ -259,6 +268,12 @@ public class TextToolsView extends FrameLayout {
 		void onTextAlignmentChanged(int newGravity);
 
 		void onModeChanged(EditingModes newMode, EditingModes oldMode);
+
+		void onBackgroundColorChanged(int color);
+
+		void onTextColorChanged(int color);
+
+		void onFontChanged(String fontName, Typeface typeface);
 	}
 
 	public void setTextToolsListener(TextToolsListener textToolsListener) {
